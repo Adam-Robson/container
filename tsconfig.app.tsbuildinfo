@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/contexts/authprovider.tsx","./src/hooks/uselocalstorage.ts","./src/lib/auth-types.d.ts","./src/middlwares/actionvalidator.ts","./src/reducer/auth.ts","./src/reducer/list.ts","./src/reducer/logger.ts","./src/services/auth.ts","./src/services/config.ts","./src/tests/app.test.tsx"],"version":"5.9.3"}

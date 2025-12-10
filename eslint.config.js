@@ -5,11 +5,11 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import react from 'eslint-plugin-react';
 
-export default tseslint.config(
+export default [
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'eslint.config.js'] },
   {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
@@ -19,7 +19,6 @@ export default tseslint.config(
       },
       parser: tseslint.parser,
       parserOptions: {
-        project: import.meta.dirname,
         tsconfigRootDir: import.meta.dirname,
         projectService: true
       }
@@ -38,4 +37,4 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-return': 0
     }
   }
-);
+];
