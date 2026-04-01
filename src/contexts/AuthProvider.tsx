@@ -1,10 +1,10 @@
+import type { User } from 'firebase/auth';
 import { createContext, useContext, useEffect, useReducer } from 'react';
-import { User, onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '../services/config';
 import useLocalStorage from '../hooks/useLocalStorage';
-import { signInWithGoogle, signInWithGithub } from '../services/auth';
-import { AuthContextType } from '../lib/auth-types';
-import { initialAuthState, authReducer } from '../reducer/auth';
+import type { AuthContextType } from '../lib/auth-types';
+import { authReducer, initialAuthState } from '../reducer/auth';
+import { signInWithGithub, signInWithGoogle } from '../services/auth';
+import { auth } from '../services/config';
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -13,7 +13,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const [storedUser, setStoredUser] = useLocalStorage<User | null>(
     'authUser',
-    null
+    null,
   );
 
   useEffect(() => {

@@ -1,10 +1,10 @@
-import { AuthAction } from '../lib/auth-types';
+import type { AuthAction } from '../lib/auth-types';
 
 const validActionTypes: string[] = [
   'LOGIN',
   'LOGOUT',
   'SET_LOADING',
-  'SET_ERROR'
+  'SET_ERROR',
 ];
 
 export default function actionValidator(dispatch: React.Dispatch<AuthAction>) {
