@@ -17,10 +17,10 @@ export type AuthAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string };
 
-// interface AuthContextType {
-//   state: AuthState;
-//   loginWithGoogle: () => Promise<void>;
-//   loginWithGithub: () => Promise<void>;
-//   logout: () => Promise<void>;
-//   // register: (email: string, password: string) => Promise<void>;
-// }
+export interface AuthContextType {
+  state: AuthState;
+  loginWithGoogle: () => Promise<void>;
+  loginWithGithub: () => Promise<void>;
+  logout: () => Promise<void>;
+  // register: (email: string, password: string) => Promise<void>;
+}
