@@ -1,8 +1,8 @@
 import {
-  GoogleAuthProvider,
   GithubAuthProvider,
+  GoogleAuthProvider,
   signInWithPopup,
-  signOut
+  signOut,
 } from 'firebase/auth';
 
 import { auth } from '../services/config';
@@ -19,7 +19,7 @@ export async function signInWithGoogle() {
   } catch (error) {
     if (error instanceof Error) {
       console.error(
-        `There was an error while signing in with Google: ${error.message}`
+        `There was an error while signing in with Google: ${error.message}`,
       );
     }
   }
@@ -37,7 +37,7 @@ export async function signInWithGithub() {
   } catch (error) {
     if (error instanceof Error) {
       console.error(
-        `There was an error while signing in with Github: ${error.message}`
+        `There was an error while signing in with Github: ${error.message}`,
       );
     }
   }

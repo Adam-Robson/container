@@ -17,7 +17,7 @@ export type AuthAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string };
 
-interface AuthContextType {
+export interface AuthContextType {
   state: AuthState;
   loginWithGoogle: () => Promise<void>;
   loginWithGithub: () => Promise<void>;

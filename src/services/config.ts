@@ -1,7 +1,9 @@
+import * as dotenv from 'dotenv';
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import * as dotenv from 'dotenv';
+
 dotenv.config();
+
 // https://firebase.google.com/docs/web/setup#available-libraries
 const apikey = process.env.VITE_APP_FIREBASE_API_KEY ?? '';
 const authdomain = process.env.VITE_APP_FIREBASE_AUTH_DOMAIN ?? '';
@@ -20,7 +22,7 @@ const firebaseConfig = {
   storageBucket: storagebucket,
   messagingSenderId: messagingsenderid,
   appId: appid,
-  measurementId: measurementid
+  measurementId: measurementid,
 };
 
 // make sure the configuration object is defined
