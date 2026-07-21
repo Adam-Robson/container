@@ -1,37 +1,34 @@
-import * as dotenv from 'dotenv';
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
-dotenv.config();
-
 // https://firebase.google.com/docs/web/setup#available-libraries
-const apikey = process.env.VITE_APP_FIREBASE_API_KEY ?? '';
-const authdomain = process.env.VITE_APP_FIREBASE_AUTH_DOMAIN ?? '';
-const projectid = process.env.VITE_APP_FIREBASE_PROJECT_ID ?? '';
-const storagebucket = process.env.VITE_APP_FIREBASE_STORAGE_BUCKET ?? '';
-const messagingsenderid =
-  process.env.VITE_APP_FIREBASE_MESSAGING_SENDER_ID ?? '';
-const appid = process.env.VITE_APP_FIREBASE_APP_ID ?? '';
-const measurementid = process.env.VITE_APP_FIREBASE_MEASUREMENT_ID ?? '';
-// Firebase configuration
-// measurementId is optional for Firebase JS SDK v7.20.0 and later
-const firebaseConfig = {
-  apiKey: apikey,
-  authDomain: authdomain,
-  projectId: projectid,
-  storageBucket: storagebucket,
-  messagingSenderId: messagingsenderid,
-  appId: appid,
-  measurementId: measurementid,
+// Vite only exposes env vars prefixed with VITE_ on import.meta.env, and
+// inlines them at build time - there is no process.env in browser code.
+const requiredEnv = {
+  apiKey: import.meta.env.VITE_APP_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_APP_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_FIREBASE_APP_ID,
 };
 
-// make sure the configuration object is defined
-if (!firebaseConfig) {
-  throw new Error(`please check the configuration object for firebase. the
-  configuration object is currently undefined`);
+const missingKeys = Object.entries(requiredEnv)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missingKeys.length > 0) {
+  throw new Error(
+    `Missing required Firebase environment variables: ${missingKeys.join(', ')}. ` +
+      'Copy .env.example to .env and fill in your Firebase project settings.',
+  );
 }
 
-// initialize firebase
+// measurementId is optional for Firebase JS SDK v7.20.0 and later
+const firebaseConfig = {
+  ...requiredEnv,
+  measurementId: import.meta.env.VITE_APP_FIREBASE_MEASUREMENT_ID,
+};
+
 const app = initializeApp(firebaseConfig);
-// initialize authentication
 export const auth = getAuth(app);

@@ -1,14 +1,9 @@
-import { User } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 
 export interface AuthState {
   user: User | null;
   loading: boolean;
   error: string | null;
-}
-
-export interface Action {
-  type: string;
-  payload: User | boolean | string;
 }
 
 export type AuthAction =

@@ -17,7 +17,24 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag docker-container:$(date +%s)
+        run: docker build . --file Dockerfile --tag docker-container:ci
+
+      - name: Smoke test the image
+        run: |
+          container_id=$(docker run -d -p 8080:80 docker-container:ci)
+          trap 'docker logs "$container_id"; docker rm -f "$container_id"' EXIT
+
+          for _ in $(seq 1 10); do
+            if curl --fail --silent http://localhost:8080/ > /dev/null; then
+              echo "Container responded successfully."
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Container did not respond on port 8080." >&2
+          exit 1
 
       - name: Clean up
+        if: always()
         run: docker system prune -f
