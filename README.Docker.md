@@ -1,9 +1,17 @@
 ### Building and running your application
 
+Firebase config values are inlined into the JS bundle at build time, so copy
+`.env.example` to `.env` and fill it in before building - `docker compose`
+will read it and pass the values through as build args.
+
 When you're ready, start your application by running:
 `docker compose up --build`.
 
-Your application will be available at http://localhost:5173.
+Your application will be available at http://localhost:8080.
+
+The final image serves the built static assets with nginx (not `vite
+preview`, which is a development-only tool), so the container listens on
+port 80 internally.
 
 ### Deploying your application to the cloud
 
