@@ -52,7 +52,7 @@ RUN npm run build
 # Serve the built static assets with nginx. The app is a static SPA once
 # built, so it does not need Node (or any devDependencies like vite) at
 # runtime - `vite preview` is a dev-only tool and is not meant for production.
-FROM nginx:1.29-alpine AS final
+FROM nginx:1.31-alpine AS final
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
