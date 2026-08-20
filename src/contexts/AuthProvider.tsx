@@ -1,85 +1,75 @@
+import { FirebaseError } from 'firebase/app';
 import type { User } from 'firebase/auth';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { createContext, useContext, useEffect, useReducer } from 'react';
-import useLocalStorage from '../hooks/useLocalStorage';
+import { onAuthStateChanged } from 'firebase/auth';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
 import type { AuthContextType } from '../lib/auth-types';
 import { authReducer, initialAuthState } from '../reducer/auth';
-import { signInWithGithub, signInWithGoogle } from '../services/auth';
+import {
+  signInAsGuest,
+  signInWithGithub,
+  signInWithGoogle,
+  signOutUser,
+} from '../services/auth';
 import { auth } from '../services/config';
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
+/** Dismiss sign-in popup. */
+const CANCELLED_BY_USER = new Set([
+  'auth/popup-closed-by-user',
+  'auth/cancelled-popup-request',
+  'auth/user-cancelled',
+]);
+
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialAuthState);
 
-  const [storedUser, setStoredUser] = useLocalStorage<User | null>(
-    'authUser',
-    null,
-  );
-
+  // Firebase persists the session (IndexedDB by default);
+  // single source of truth.
   useEffect(() => {
-    if (storedUser) {
-      dispatch({ type: 'LOGIN', payload: storedUser });
-      dispatch({ type: 'SET_LOADING', payload: false });
-    } else {
-      const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
-        if (user) {
-          dispatch({ type: 'LOGIN', payload: user });
-          setStoredUser(user);
-        } else {
-          dispatch({ type: 'LOGOUT' });
-          setStoredUser(null);
-        }
+    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
+      dispatch(user ? { type: 'LOGIN', payload: user } : { type: 'LOGOUT' });
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const run = useCallback(async (action: () => Promise<unknown>) => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      await action();
+      // clear the loading flag when session settles
+    } catch (error) {
+      if (error instanceof FirebaseError && CANCELLED_BY_USER.has(error.code)) {
         dispatch({ type: 'SET_LOADING', payload: false });
+        return;
+      }
+      dispatch({
+        type: 'SET_ERROR',
+        payload:
+          error instanceof Error ? error.message : 'Authentication failed.',
       });
-
-      return () => unsubscribe();
     }
-  }, [storedUser, setStoredUser]);
+  }, []);
 
-  const loginWithGoogle = async () => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      await signInWithGoogle();
-    } catch (error) {
-      if (error instanceof Error) {
-        dispatch({ type: 'SET_ERROR', payload: error.message });
-      }
-    }
-  };
+  const loginWithGoogle = useCallback(() => run(signInWithGoogle), [run]);
+  const loginWithGithub = useCallback(() => run(signInWithGithub), [run]);
+  const loginAsGuest = useCallback(() => run(signInAsGuest), [run]);
+  const logout = useCallback(() => run(signOutUser), [run]);
 
-  const loginWithGithub = async () => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      await signInWithGithub();
-    } catch (error) {
-      if (error instanceof Error) {
-        dispatch({ type: 'SET_ERROR', payload: error.message });
-      }
-    }
-  };
-
-  // Function to handle logout
-  const logout = async () => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      await signOut(auth);
-      dispatch({ type: 'LOGOUT' });
-      setStoredUser(null);
-    } catch (error) {
-      if (error instanceof Error) {
-        dispatch({ type: 'SET_ERROR', payload: error.message });
-      }
-    }
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{ state, loginWithGoogle, loginWithGithub, logout }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ state, loginWithGoogle, loginWithGithub, loginAsGuest, logout }),
+    [state, loginWithGoogle, loginWithGithub, loginAsGuest, logout],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 function useAuth(): AuthContextType {
