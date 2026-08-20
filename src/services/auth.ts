@@ -1,54 +1,43 @@
 import {
   GithubAuthProvider,
   GoogleAuthProvider,
+  signInAnonymously,
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
 
-import { auth } from '../services/config';
+import { auth } from './config';
 
+/**
+ * Authenticate with Google.
+ */
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
-
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential?.accessToken;
-    const user = result.user;
-    return { user, token };
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(
-        `There was an error while signing in with Google: ${error.message}`,
-      );
-    }
-  }
+  const result = await signInWithPopup(auth, provider);
+  const credential = GoogleAuthProvider.credentialFromResult(result);
+  return { user: result.user, token: credential?.accessToken };
 }
 
+/**
+ * Authenticate with GitHub.
+ */
 export async function signInWithGithub() {
   const provider = new GithubAuthProvider();
+  const result = await signInWithPopup(auth, provider);
+  const credential = GithubAuthProvider.credentialFromResult(result);
+  // This token is only handed to us here; Firebase does not store or refresh
+  // it. Persist it deliberately if repo/gist access is needed later.
+  return { user: result.user, token: credential?.accessToken };
+}
 
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const credential = GithubAuthProvider.credentialFromResult(result);
-    const token = credential?.accessToken;
-    const user = result.user;
-    return { user, token };
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(
-        `There was an error while signing in with Github: ${error.message}`,
-      );
-    }
-  }
+/**
+ * Give access immediately for site visitors.
+ */
+export async function signInAsGuest() {
+  const result = await signInAnonymously(auth);
+  return { user: result.user };
 }
 
 export async function signOutUser() {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(`There was an error while signing out: ${error.message}`);
-    }
-  }
+  await signOut(auth);
 }
