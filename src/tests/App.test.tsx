@@ -7,7 +7,7 @@ vi.mock('firebase/auth', async (importOriginal) => ({
   onAuthStateChanged: vi.fn(
     (_auth: unknown, callback: (user: null) => void) => {
       callback(null);
-      return () => { };
+      return () => {};
     },
   ),
 }));

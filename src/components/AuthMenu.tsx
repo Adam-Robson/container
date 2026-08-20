@@ -1,7 +1,8 @@
 import { useAuth } from '../contexts/AuthProvider';
 
 export default function AuthMenu() {
-  const { state, loginWithGithub, loginWithGoogle, loginAsGuest, logout } = useAuth();
+  const { state, loginWithGithub, loginWithGoogle, loginAsGuest, logout } =
+    useAuth();
 
   if (state.loading) {
     return <span className="auth-menu__user">…</span>;
@@ -30,7 +31,7 @@ export default function AuthMenu() {
       <button type="button" className="btn" onClick={loginWithGithub}>
         Sign in with GitHub
       </button>
-       <button type="button" className="btn" onClick={loginWithGoogle}>
+      <button type="button" className="btn" onClick={loginWithGoogle}>
         Sign in with Google
       </button>
     </div>
