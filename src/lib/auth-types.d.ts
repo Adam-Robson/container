@@ -6,11 +6,6 @@ export interface AuthState {
   error: string | null;
 }
 
-export interface Action {
-  type: string;
-  payload: User | boolean | string;
-}
-
 export type AuthAction =
   | { type: 'LOGIN'; payload: User }
   | { type: 'LOGOUT' }
@@ -21,6 +16,6 @@ export interface AuthContextType {
   state: AuthState;
   loginWithGoogle: () => Promise<void>;
   loginWithGithub: () => Promise<void>;
+  loginAsGuest: () => Promise<void>;
   logout: () => Promise<void>;
-  // register: (email: string, password: string) => Promise<void>;
 }
