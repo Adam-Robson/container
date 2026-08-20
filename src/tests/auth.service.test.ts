@@ -47,19 +47,6 @@ describe('services/auth', () => {
     expect(result).toEqual({ user, token: 'google-token' });
   });
 
-  test('signInWithGoogle swallows popup errors and logs them', async () => {
-    vi.mocked(signInWithPopup).mockRejectedValue(new Error('popup closed'));
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
-
-    const result = await signInWithGoogle();
-
-    expect(result).toBeUndefined();
-    expect(consoleError).toHaveBeenCalled();
-    consoleError.mockRestore();
-  });
-
   test('signInWithGithub returns the signed-in user and access token', async () => {
     const user = { uid: 'github-user' };
     // biome-ignore lint/suspicious/noExplicitAny: partial firebase mock

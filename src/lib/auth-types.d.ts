@@ -16,6 +16,6 @@ export interface AuthContextType {
   state: AuthState;
   loginWithGoogle: () => Promise<void>;
   loginWithGithub: () => Promise<void>;
+  loginAsGuest: () => Promise<void>;
   logout: () => Promise<void>;
-  // register: (email: string, password: string) => Promise<void>;
 }

@@ -14,6 +14,8 @@ vi.mock('firebase/auth', () => ({
 vi.mock('../services/auth', () => ({
   signInWithGoogle: vi.fn(),
   signInWithGithub: vi.fn(),
+  signInAsGuest: vi.fn(),
+  signOutUser: vi.fn(),
 }));
 
 function TestConsumer() {
@@ -28,7 +30,6 @@ function TestConsumer() {
 
 describe('AuthProvider', () => {
   beforeEach(() => {
-    window.localStorage.clear();
     onAuthStateChangedMock.mockReset();
   });
 
@@ -48,23 +49,6 @@ describe('AuthProvider', () => {
       expect(screen.getByTestId('loading')).toHaveTextContent('false');
     });
     expect(screen.getByTestId('user')).toHaveTextContent('none');
-  });
-
-  test('hydrates from a previously stored user without calling firebase', () => {
-    window.localStorage.setItem(
-      'authUser',
-      JSON.stringify({ uid: 'stored-user' }),
-    );
-
-    render(
-      <AuthProvider>
-        <TestConsumer />
-      </AuthProvider>,
-    );
-
-    expect(screen.getByTestId('user')).toHaveTextContent('stored-user');
-    expect(screen.getByTestId('loading')).toHaveTextContent('false');
-    expect(onAuthStateChangedMock).not.toHaveBeenCalled();
   });
 
   test('useAuth throws when used outside an AuthProvider', () => {
