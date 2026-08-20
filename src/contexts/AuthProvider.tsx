@@ -11,6 +11,7 @@ import {
 } from 'react';
 import type { AuthContextType } from '../lib/auth-types';
 import { authReducer, initialAuthState } from '../reducer/auth';
+import logger from '../reducer/logger';
 import {
   signInAsGuest,
   signInWithGithub,
@@ -28,8 +29,11 @@ const CANCELLED_BY_USER = new Set([
   'auth/user-cancelled',
 ]);
 
+// Log every dispatched action and resulting state in development only.
+const reducer = import.meta.env.DEV ? logger(authReducer) : authReducer;
+
 function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(authReducer, initialAuthState);
+  const [state, dispatch] = useReducer(reducer, initialAuthState);
 
   // Firebase persists the session (IndexedDB by default);
   // single source of truth.
