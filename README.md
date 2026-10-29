@@ -29,16 +29,16 @@ secrets. Firebase access is controlled by Auth settings and Security Rules.
 
 ## Scripts
 
-| Script | What it does |
-| --- | --- |
-| `npm run dev` | Vite dev server (`--host`, so it is reachable on your LAN) |
-| `npm run build` | Typecheck, then build to `dist/` |
-| `npm run preview` | Serve the production build locally |
-| `npm run typecheck` | `tsc -b` with no emit |
-| `npm run lint` | Biome check |
-| `npm run lint:fix` | Biome check with fixes applied |
-| `npm run test` | Vitest, single run |
-| `npm run test:watch` | Vitest in watch mode |
+| Script               | What it does                                               |
+| -------------------- | ---------------------------------------------------------- |
+| `npm run dev`        | Vite dev server (`--host`, so it is reachable on your LAN) |
+| `npm run build`      | Typecheck, then build to `dist/`                           |
+| `npm run preview`    | Serve the production build locally                         |
+| `npm run typecheck`  | `tsc -b` with no emit                                      |
+| `npm run lint`       | Biome check                                                |
+| `npm run lint:fix`   | Biome check with fixes applied                             |
+| `npm run test`       | Vitest, single run                                         |
+| `npm run test:watch` | Vitest in watch mode                                       |
 
 ## Layout
 
