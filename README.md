@@ -10,10 +10,16 @@ Docker setup for both development and production.
 2. Rename the project:
    - `name` in `package.json`
    - `<title>` and description in `index.html`
-   - the brand text in `src/App.tsx` and heading in `src/pages/Home.tsx`
+   - the brand text in `src/App.tsx` and heading in `src/pages/Home.tsx`, and
+     the matching assertions in `src/tests/App.test.tsx`
    - `public/favicon.svg`
    - the copyright holder in `LICENSE`
 3. Start building in `src/pages/Home.tsx`.
+
+To add a page, create a component in `src/pages/` and add it to the
+`children` of the route table in `src/routes/router.tsx`, above the `*`
+catch-all. Add a matching `NavLink` in `src/App.tsx` if it belongs in the
+header.
 
 ## Running with Docker
 
@@ -30,9 +36,11 @@ the host reload in the browser. After changing dependencies, rebuild it with
 container picks up the new `node_modules`.
 
 The production image is a multi-stage build: Node compiles the app, then an
-unprivileged nginx image serves the static files on port 8080. `nginx.conf`
-falls back to `index.html` for unknown paths so client-side routes survive a
-page refresh.
+unprivileged nginx image serves the static files on port 8080, with a
+`HEALTHCHECK` against `/`. `nginx.conf` falls back to `index.html` for unknown
+paths so client-side routes survive a page refresh, caches fingerprinted
+`/assets/` files indefinitely, and marks `index.html` as `no-cache` so new
+deploys are picked up.
 
 To build for a different CPU architecture than your machine (for example,
 deploying to amd64 from an Apple Silicon Mac):
@@ -58,17 +66,21 @@ npm run dev
 | `npm run typecheck`  | `tsc -b` with no emit                                      |
 | `npm run lint`       | Biome check                                                |
 | `npm run lint:fix`   | Biome check with fixes applied                             |
+| `npm run format`     | Biome format check (no writes)                             |
 | `npm run test`       | Vitest, single run                                         |
 | `npm run test:watch` | Vitest in watch mode                                       |
 
 ## Layout
 
 ```text
+public/         Static files copied as-is (favicon)
 src/
   pages/        Route components (Home, NotFound)
-  routes/       Route table
+  routes/       Route table, shared by the app and the tests
   tests/        Vitest setup and specs
+  main.tsx      Entry point: mounts the browser router
   App.tsx       Shell: header and route outlet
+  App.css       Shell styles
   index.css     Design tokens, reset, and base styles
 Dockerfile      dev and production stages
 compose.yaml    web (production) and dev services
