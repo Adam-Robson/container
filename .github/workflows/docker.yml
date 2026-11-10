@@ -16,8 +16,27 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v7
 
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag docker-container:$(date +%s)
+      - name: Build the production image
+        run: docker build --tag container:ci .
 
-      - name: Clean up
-        run: docker system prune -f
+      - name: Build the dev image
+        run: docker build --target dev --tag container:ci-dev .
+
+      - name: Start the container
+        run: docker run --detach --name web --publish 8080:8080 container:ci
+
+      - name: Wait for the server
+        run: |
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent --output /dev/null http://localhost:8080/; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs web
+          exit 1
+
+      - name: Check the index page and SPA fallback
+        run: |
+          curl --fail --silent http://localhost:8080/ | grep --quiet '<div id="root">'
+          curl --fail --silent http://localhost:8080/some/client/route | grep --quiet '<div id="root">'

@@ -11,7 +11,6 @@ export default defineConfig({
     // imports type-check but fail to resolve at build and dev time.
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@public': fileURLToPath(new URL('./public', import.meta.url)),
     },
   },
   test: {

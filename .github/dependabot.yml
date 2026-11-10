@@ -16,7 +16,6 @@ updates:
   - package-ecosystem: "npm"
     # Look for `package.json` and `lock` files in the `root` directory
     directory: "/"
-    # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "weekly"
     groups:
@@ -24,6 +23,9 @@ updates:
         applies-to: version-updates
         dependency-type: development
       production-dependencies:
+        applies-to: version-updates
+        dependency-type: production
+      production-security:
         applies-to: security-updates
         dependency-type: production
 
