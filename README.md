@@ -1,33 +1,54 @@
 # container
 
-A browser-based workspace for writing JavaScript and TypeScript and downloading
-the result as a ready-to-run project.
+A containerized starter for single-page apps: Vite, React 19, TypeScript, and
+React Router, with Biome for linting and formatting, Vitest for tests, and a
+Docker setup for both development and production.
 
-Built with Vite, React 18, TypeScript, React Router, and Firebase Auth.
-Linting and formatting are handled by Biome; tests run on Vitest.
+## Using this template
 
-## Getting started
+1. Click **Use this template** on GitHub (or clone the repo).
+2. Rename the project:
+   - `name` in `package.json`
+   - `<title>` and description in `index.html`
+   - the brand text in `src/App.tsx` and heading in `src/pages/Home.tsx`
+   - `public/favicon.svg`
+   - the copyright holder in `LICENSE`
+3. Start building in `src/pages/Home.tsx`.
+
+## Running with Docker
+
+No local Node install is needed.
+
+| Command                                       | What it runs                     | URL                     |
+| --------------------------------------------- | -------------------------------- | ----------------------- |
+| `docker compose up --build`                   | Production build served by nginx | <http://localhost:8080> |
+| `docker compose --profile dev up --build dev` | Vite dev server with hot reload  | <http://localhost:5173> |
+
+The dev service mounts the project directory into the container, so edits on
+the host reload in the browser. After changing dependencies, rebuild it with
+`docker compose --profile dev up --build --renew-anon-volumes dev` so the
+container picks up the new `node_modules`.
+
+The production image is a multi-stage build: Node compiles the app, then an
+unprivileged nginx image serves the static files on port 8080. `nginx.conf`
+falls back to `index.html` for unknown paths so client-side routes survive a
+page refresh.
+
+To build for a different CPU architecture than your machine (for example,
+deploying to amd64 from an Apple Silicon Mac):
+
+```bash
+docker build --platform=linux/amd64 -t myapp .
+```
+
+## Running without Docker
+
+Requires the Node version listed under `engines` in `package.json`.
 
 ```bash
 npm install
-cp .env.example .env   # fill in from your Firebase console
 npm run dev
 ```
-
-The app throws on startup with a list of missing keys if `.env` is incomplete,
-rather than failing later with an opaque Firebase error.
-
-### Firebase setup
-
-Create a web app under **Project settings → General → Your apps** and copy the
-SDK config values into `.env`. Under **Authentication → Sign-in method**, enable
-the providers the app uses: **Google**, **GitHub**, and **Anonymous** (anonymous
-sign-in backs the "Continue as guest" flow).
-
-These `VITE_APP_*` values are compiled into the client bundle and are not
-secrets. Firebase access is controlled by Auth settings and Security Rules.
-
-## Scripts
 
 | Script               | What it does                                               |
 | -------------------- | ---------------------------------------------------------- |
@@ -42,30 +63,35 @@ secrets. Firebase access is controlled by Auth settings and Security Rules.
 
 ## Layout
 
-```
+```text
 src/
-  components/   Shared UI (AuthMenu)
-  contexts/     AuthProvider — the app's auth boundary
-  hooks/        useLocalStorage
-  lib/          Shared type declarations
-  middleware/   Reducer dispatch middleware
-  pages/        Route components (Home, Editor, NotFound)
-  reducer/      Reducers and the logging wrapper
-  routes/       Router configuration
-  services/     Firebase init and auth calls
+  pages/        Route components (Home, NotFound)
+  routes/       Route table
   tests/        Vitest setup and specs
+  App.tsx       Shell: header and route outlet
+  index.css     Design tokens, reset, and base styles
+Dockerfile      dev and production stages
+compose.yaml    web (production) and dev services
+nginx.conf      Static file serving and SPA fallback
 ```
 
 `@/*` is aliased to `src/*` in both `tsconfig.app.json` and `vite.config.ts`.
 
-## Adding the editor
+## Environment variables
 
-`src/pages/Editor.tsx` is the mount point. It is loaded through `React.lazy` in
-`src/routes/router.tsx`, so the editor bundle stays out of the initial page
-load. `.editor__surface` is a sized grid child with a resolved height, which is
-what Monaco requires — it measures its container on mount and collapses to zero
-height inside an auto-height parent.
+Vite exposes variables prefixed with `VITE_` to client code and compiles them
+into the bundle at build time, so they are not secrets. `.env` files are
+excluded from the Docker build context; pass build-time values with
+`--build-arg` and a matching `ARG` in the `build` stage of the `Dockerfile`.
 
-## Docker
+## CI
 
-See [README.Docker.md](README.Docker.md).
+- **Continuous Integration** — lint, build, and test on Node 22 and 24.
+- **Docker Image CI** — builds both image targets, starts the production
+  container, and checks the index page and the SPA fallback.
+- **Dependabot** — weekly updates for npm, GitHub Actions, and Docker base
+  images.
+
+## License
+
+[MIT](LICENSE)

@@ -43,39 +43,3 @@
   flex-direction: column;
   min-height: 0;
 }
-
-.btn--ghost {
-  background-color: transparent;
-  border-color: var(--border);
-  color: var(--text-main);
-}
-
-.btn--ghost:hover {
-  background-color: var(--bg);
-}
-
-.auth-menu {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.auth-menu__user {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-}
-
-.auth-error {
-  padding: var(--space-sm) var(--space-md);
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--border);
-  color: #b91c1c;
-  font-size: 0.875rem;
-}
-
-.route-fallback {
-  display: grid;
-  place-items: center;
-  flex: 1;
-  color: var(--text-muted);
-}

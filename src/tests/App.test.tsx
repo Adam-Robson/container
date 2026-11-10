@@ -1,62 +1,34 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
-
-vi.mock('firebase/auth', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('firebase/auth')>()),
-  getAuth: vi.fn(() => ({}) as never),
-  onAuthStateChanged: vi.fn(
-    (_auth: unknown, callback: (user: null) => void) => {
-      callback(null);
-      return () => {};
-    },
-  ),
-}));
-
-const { createMemoryRouter, RouterProvider } = await import('react-router-dom');
-const { default: App } = await import('../App');
-const { default: Home } = await import('../pages/Home');
-const { AuthProvider } = await import('../contexts/AuthProvider');
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { describe, expect, test } from 'vitest';
+import { routes } from '../routes/router';
 
 function renderApp(initialPath = '/') {
-  const router = createMemoryRouter(
-    [
-      {
-        path: '/',
-        element: <App />,
-        children: [{ index: true, element: <Home /> }],
-      },
-    ],
-    { initialEntries: [initialPath] },
-  );
-
-  return render(
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>,
-  );
+  const router = createMemoryRouter(routes, { initialEntries: [initialPath] });
+  return render(<RouterProvider router={router} />);
 }
 
 describe('App shell', () => {
   test('renders the brand in the header', () => {
     renderApp();
-    expect(screen.getByTestId('container')).toHaveTextContent('container');
+    expect(screen.getByTestId('brand')).toHaveTextContent('container');
   });
 
-  test('offers sign-in options when signed out', () => {
+  test('renders the home page at /', () => {
     renderApp();
     expect(
-      screen.getByRole('button', { name: /continue as guest/i }),
-    ).toBeDefined();
-    expect(
-      screen.getByRole('button', { name: /sign in with github/i }),
-    ).toBeDefined();
+      screen.getByRole('heading', { level: 1, name: 'container' }),
+    ).toBeInTheDocument();
   });
 
-  test('links to the editor route', () => {
-    renderApp();
-    expect(screen.getByRole('link', { name: /^editor$/i })).toHaveAttribute(
+  test('renders the not-found page for an unknown path', () => {
+    renderApp('/does/not/exist');
+    expect(
+      screen.getByRole('heading', { level: 1, name: '404' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /back home/i })).toHaveAttribute(
       'href',
-      '/editor',
+      '/',
     );
   });
 });
