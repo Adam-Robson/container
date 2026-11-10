@@ -4,7 +4,7 @@
 #   dev    Vite dev server with hot reload (used by the `dev` compose service)
 #   final  nginx serving the production build (default target)
 
-FROM node:24-alpine AS base
+FROM node:26-alpine AS base
 WORKDIR /app
 
 # Install dependencies in their own layer so source edits don't invalidate it.
